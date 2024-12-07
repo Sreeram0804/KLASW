@@ -101,7 +101,13 @@ while(True):
 
                     #running stores {machine_id:[wafer_id,end_time]}
                     running[machine['machine_id']]=[wafer,time+wafers[wafer][machine['step_id']]]
-                    schedule.append({'wafer_id':wafer,'step':machine['step_id'],'machine':machine['machine_id'],'start_time':time,'end_time':time+wafers[wafer][machine['step_id']]})
+                    schedule.append(
+                        {'wafer_id':wafer,
+                         'step':machine['step_id'],
+                         'machine':machine['machine_id'],
+                         'start_time':time,
+                         'end_time':time+wafers[wafer][machine['step_id']]}
+                         )
                     break
         else:
             if(fluctuation_cooldown[machine['machine_id']]<=time and running[machine['machine_id']][1]-1==time):
