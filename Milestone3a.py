@@ -49,7 +49,7 @@ def check_parameters(step_id,steps,machine,m_parameters):
             for parameter in param.keys():
                 if(param[parameter][0]>m_parameters[parameter] or param[parameter][1]<m_parameters[parameter]):
                     return False
-    return True
+    return True  
 
 fluctuation_quantity={}
 fluctuation_cooldown={}
@@ -57,7 +57,7 @@ machine_parameters={}
 for machine in machines_data:
     fluctuation_quantity[machine['machine_id']]=machine['n']
     fluctuation_cooldown[machine['machine_id']]=0
-    machine_parameters[machine['machine_id']]=machine['initial_parameters']
+    machine_parameters[machine['machine_id']]=machine['initial_parameters'].copy()
 
 # quantity=len(wafers)
 time=0
@@ -71,16 +71,23 @@ while(True):
                     schedule.append({'wafer_id':name,'step':machine['step_id'],'machine':machine['machine_id'],'start_time':time,'end_time':time+wafers[wafer][machine['step_id']]})
                     break
         else:
-            if(running[machine['machine_id']][1]-1==time):
+            if(fluctuation_cooldown[machine['machine_id']]<=time and running[machine['machine_id']][1]-1==time):
                 finished[machine['step_id']].append(running[machine['machine_id']][0])
                 running[machine['machine_id']]=[]
                 fluctuation_quantity[machine['machine_id']]-=1
                 if(fluctuation_quantity[machine['machine_id']]==0):
                     fluctuation_quantity[machine['machine_id']]=machine['n']
                     #to add fluctuation
-                    machine_parameters[machine['machine_id']]+=machine['fluctuation']
-            if(check_parameters(machine['step_id'],steps_data,machine['machine_id'],machine_parameters[machine['machine_id']])):
-                fluctuation_cooldown[machine['machine_id']]=time+machine['cooldown_time']
+                    temp_param=machine_parameters[machine['machine_id']]
+                    for key in temp_param.keys():
+                        if(key in machine['fluctuation'].keys()):
+                            temp_param[key]=temp_param[key]+machine['fluctuation'][key]
+                    # for param in machine_parameters[machine['machine_id']].keys():
+                    #     machine_parameters[machine['machine_id']]+=machine['fluctuation']
+                    machine_parameters[machine['machine_id']]=temp_param
+            if(check_parameters(machine['step_id'],steps_data,machine['machine_id'],machine_parameters[machine['machine_id']])==False):
+                fluctuation_cooldown[machine['machine_id']]=time+machine['cooldown_time']+1
+                machine_parameters[machine['machine_id']]=machine['initial_parameters'].copy()
     time+=1
     flag=1
     for step in steps_data:
@@ -93,5 +100,5 @@ while(True):
 print(schedule)
 
 result={'schedule':schedule}
-with open('Mileston3aOutput.json','w') as file:
+with open('Milestone3aOutput.json','w') as file:
     json.dump(result,file)
