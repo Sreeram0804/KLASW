@@ -44,8 +44,8 @@ def check(wafer,finished,running):
 
 
 #To check if the parameters are within the specified range
-def check_parameters(step_id,steps,machine,m_parameters):
-    for step in steps_data:
+def check_parameters(step_id,steps,m_parameters):
+    for step in steps:
         if(step['id']==step_id):
             param=step['parameters']
             for parameter in param.keys():
@@ -67,13 +67,13 @@ def check_dependency(step_id,wafer,finished):
 
 #checks if machine is currently unoccupied,if all parameters are satisfied and not in cooldown
 def first_check(running,step_id,steps_data,machine_id,parameters,fluctuation_cooldown,time):
-    if(running[machine_id]==[] and check_parameters(step_id,steps_data,machine_id,parameters) and fluctuation_cooldown[machine_id]<=time):
+    if(running[machine_id]==[] and check_parameters(step_id,steps_data,parameters) and fluctuation_cooldown[machine_id]<=time):
         return True
     return False
 
 
 #checks if wafer has a step to be processed in this machine,is currently running or finished the step and checks dependency
-def second_check(step_id,wafer,wafers,finished,running,cuurent_finished):
+def second_check(step_id,wafer,wafers,finished,running,current_finished):
     if(step_id in wafers[wafer].keys() and wafers[wafer][step_id]!=0 and check(wafer,finished[step_id],running) 
        and wafer not in current_finished and check_dependency(step_id,wafer,finished)):
         return True
@@ -133,7 +133,7 @@ while(True):
                             temp_param[key]=temp_param[key]+machine['fluctuation'][key]
             
             #checks if the machines parameters are in range else puts it in cooldown
-            if(check_parameters(machine['step_id'],steps_data,machine['machine_id'],machine_parameters[machine['machine_id']])==False):
+            if(check_parameters(machine['step_id'],steps_data,machine_parameters[machine['machine_id']])==False):
                 fluctuation_cooldown[machine['machine_id']]=time+machine['cooldown_time']+1
                 machine_parameters[machine['machine_id']]=machine['initial_parameters'].copy()
     time+=1
