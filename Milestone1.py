@@ -75,7 +75,7 @@ while(True):
                 finished[machine['step_id']].append(running[machine['machine_id']][0])
                 running[machine['machine_id']]=[]
     time+=1
-    # min_time=9999
+    # min_time=9999        #Dropped as it skips wafers sometimes if gone directly to the next min value in running
     # for run_time in running.values():
     #     if(len(run_time)!=0):
     #         min_time=min(min_time,run_time[1])
