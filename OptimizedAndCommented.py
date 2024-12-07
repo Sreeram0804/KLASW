@@ -116,6 +116,7 @@ while(True):
                         for i in waf['processing_times'].keys():
                             if(name not in finished[i]):
                                 f=1
+                                break
                         if(f==0):
                             wafers.pop(name)
                         break
